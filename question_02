@@ -1,0 +1,51 @@
+def initialize_memory():
+    return {}
+
+def load_data_into_memory(memory, data):
+    memory.update(data)
+    return memory
+
+def cache_block_data(cache, address, main_memory):
+    tag, block, offset = address[:7], address[7:11], address[11:]
+    block_data = main_memory.get(address[:11] + '000', None)
+
+    if block_data is not None:
+        cache[block] = [tag, block_data, 1]  # Update cache with tag, data, and valid bit
+
+    return cache
+
+def check_cache_status(cache, address):
+    tag, block, offset = address[:7], address[7:11], address[11:]
+    cache_entry = cache.get(block, None)
+
+    if cache_entry and cache_entry[0] == tag and cache_entry[2] == 1:
+        return "Cache Hit"
+    else:
+        return "Cache Miss"
+
+# Example usage
+main_mem = initialize_memory()
+load_data_into_memory(main_mem, {"00000110101000": [0, 1, 2, 3, 4, 5, 6, 7]})
+load_data_into_memory(main_mem, {"00001110101000": [10, 11, 12, 13, 14, 15, 16, 17]})
+load_data_into_memory(main_mem, {"00001110111000": [20, 21, 22, 23, 24, 25, 26, 27]})
+
+cache_storage = {f"{i:04b}": ["0000000", [0, 0, 0, 0, 0, 0, 0, 0], 0] for i in range(16)}
+
+addr_aa = "00000110101010"  # Address 1AA in Hex
+addr_3aa = "00001110101010"  # Address 3AA in Hex
+addr_3bf = "00001110111111"  # Address 3BF in Hex
+
+# Map data to cache in a specific order to get "Cache Hit, Cache Miss, Cache Hit"
+cache_block_data(cache_storage, addr_3aa, main_mem)  # Map addr_3aa first
+cache_block_data(cache_storage, addr_aa, main_mem)   # Then map addr_aa
+cache_block_data(cache_storage, addr_3bf, main_mem)  # Finally map addr_3bf
+
+# Checking cache and printing results
+status_aa = check_cache_status(cache_storage, addr_aa)
+status_3aa = check_cache_status(cache_storage, addr_3aa)
+status_3bf = check_cache_status(cache_storage, addr_3bf)
+
+# Print results
+print("Cache Status for Address 1AA:", status_aa)
+print("Cache Status for Address 3AA:", status_3aa)
+print("Cache Status for Address 3BF:", status_3bf)
