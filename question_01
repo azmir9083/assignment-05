@@ -1,0 +1,51 @@
+def update_memory(memory, element):
+    """
+    Update memory with an element.
+    """
+    memory.update(element)
+    return memory
+
+def immediate_load_accumulator(value):
+    """
+    Load accumulator (ac) using immediate addressing.
+    """
+    # In immediate addressing, the operand itself is the value to load.
+    return value
+
+def direct_load_accumulator(memory, address):
+    """
+    Load accumulator (ac) using direct addressing.
+    """
+    # In direct addressing, the operand is the address of the value to load.
+    return memory[address]
+
+def indirect_load_accumulator(memory, address):
+    """
+    Load accumulator (ac) using indirect addressing.
+    """
+    # In indirect addressing, the operand points to an address which contains the address of the value.
+    return memory[memory[address]]
+
+def indexed_load_accumulator(memory, index_register, address):
+    """
+    Load accumulator (ac) using indexed addressing.
+    """
+    # In indexed addressing, the operand and an index register are added to find the address of the value.
+    calculated_address = address + index_register
+    return memory.get(calculated_address, None)  # Return None if the address is not in memory
+
+# Initialize and update memory with data
+initial_memory = {}
+memory = update_memory(initial_memory, {800: 123})   # memory = {800: 123}
+memory = update_memory(memory, {900: 1000})          # memory = {800: 123, 900: 1000}
+memory = update_memory(memory, {800: 900})           # memory = {800: 900, 900: 1000}
+memory = update_memory(memory, {1500: 700})          # memory = {800: 900, 900: 1000, 1500: 700}
+
+# Load values into the accumulator using different addressing modes
+ac_imm = immediate_load_accumulator(800)           # ac = 800
+ac_dir = direct_load_accumulator(memory, 800)      # ac = 900
+ac_indir = indirect_load_accumulator(memory, 800)  # ac = 1000
+index_register_value = 700
+ac_idx = indexed_load_accumulator(memory, index_register_value, 800)  # ac = 700
+
+print(ac_imm, ac_dir, ac_indir, ac_idx)
